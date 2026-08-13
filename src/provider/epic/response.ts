@@ -31,6 +31,15 @@ export interface Promotions {
   upcomingPromotionalOffers: PromotionGroup[];
 }
 
+export interface EpicMapping {
+  pageSlug: string;
+  pageType: string;
+}
+
+export interface CatalogNamespace {
+  mappings: EpicMapping[];
+}
+
 export interface EpicElement {
   title: string;
   id: string;
@@ -41,6 +50,8 @@ export interface EpicElement {
   urlSlug: string;
   keyImages: KeyImage[];
   promotions: Promotions | null;
+  catalogNs: CatalogNamespace | null;
+  offerMappings: EpicMapping[];
 }
 
 export interface EpicResponse {
@@ -69,6 +80,26 @@ function readIntField(value: unknown, path: string): number | undefined {
   if (value === undefined) return undefined;
   if (!isInteger(value)) throw parseError(value, path);
   return value;
+}
+
+function decodeMapping(raw: unknown, path: string): EpicMapping {
+  if (!isRecord(raw)) throw parseError(raw, path);
+  return {
+    pageSlug: readStringField(raw["pageSlug"], path + ".PageSlug") ?? "",
+    pageType: readStringField(raw["pageType"], path + ".PageType") ?? "",
+  };
+}
+
+function decodeMappings(raw: unknown, path: string): EpicMapping[] {
+  if (raw === undefined || raw === null) return [];
+  if (!isArray(raw)) throw parseError(raw, path);
+  return raw.map((mapping, i) => decodeMapping(mapping, `${path}[${i}]`));
+}
+
+function decodeCatalogNamespace(raw: unknown, path: string): CatalogNamespace | null {
+  if (raw === undefined || raw === null) return null;
+  if (!isRecord(raw)) throw parseError(raw, path);
+  return { mappings: decodeMappings(raw["mappings"], path + ".Mappings") };
 }
 
 function decodeKeyImage(raw: unknown, path: string): KeyImage {
@@ -143,6 +174,9 @@ function decodeElement(raw: unknown, path: string): EpicElement {
     promotions = decodePromotions(promotionsRaw, path + ".Promotions");
   }
 
+  const catalogNs = decodeCatalogNamespace(raw["catalogNs"], path + ".CatalogNs");
+  const offerMappings = decodeMappings(raw["offerMappings"], path + ".OfferMappings");
+
   return {
     title: readStringField(raw["title"], path + ".Title") ?? "",
     id: readStringField(raw["id"], path + ".ID") ?? "",
@@ -153,6 +187,8 @@ function decodeElement(raw: unknown, path: string): EpicElement {
     urlSlug: readStringField(raw["urlSlug"], path + ".URLSlug") ?? "",
     keyImages,
     promotions,
+    catalogNs,
+    offerMappings,
   };
 }
 

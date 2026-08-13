@@ -14,11 +14,46 @@ function element(partial: Partial<EpicElement> = {}): EpicElement {
     urlSlug: "",
     keyImages: [],
     promotions: null,
+    catalogNs: null,
+    offerMappings: [],
     ...partial,
   };
 }
 
 describe("storeURL", () => {
+  it("prefers a catalog productHome mapping", () => {
+    expect(
+      storeURL(
+        element({
+          productSlug: "cardpocalypse/home",
+          urlSlug: "cardpocalypsegeneralaudience",
+          catalogNs: {
+            mappings: [{ pageSlug: "cardpocalypse", pageType: "productHome" }],
+          },
+          offerMappings: [{ pageSlug: "cardpocalypse-offer", pageType: "offer" }],
+        }),
+      ),
+    ).toBe("https://store.epicgames.com/en-US/p/cardpocalypse");
+  });
+
+  it("falls back to an offerMappings productHome mapping", () => {
+    expect(
+      storeURL(
+        element({
+          productSlug: "legacy-product",
+          urlSlug: "legacy-url",
+          catalogNs: {
+            mappings: [{ pageSlug: "catalog-offer", pageType: "offer" }],
+          },
+          offerMappings: [
+            { pageSlug: "offer-only", pageType: "offer" },
+            { pageSlug: "mapped-offer", pageType: "productHome" },
+          ],
+        }),
+      ),
+    ).toBe("https://store.epicgames.com/en-US/p/mapped-offer");
+  });
+
   it("uses productSlug first", () => {
     expect(storeURL(element({ productSlug: "sample-game", urlSlug: "sample-game-123" }))).toBe(
       "https://store.epicgames.com/en-US/p/sample-game",

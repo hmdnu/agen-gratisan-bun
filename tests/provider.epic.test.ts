@@ -27,8 +27,16 @@ const epicFixture = `{
             "namespace": "ns1",
             "description": "A free game for testing.",
             "offerType": "BASE_GAME",
-            "productSlug": "free-game-one",
-            "urlSlug": "free-game-one",
+            "productSlug": "cardpocalypse/home",
+            "urlSlug": "cardpocalypsegeneralaudience",
+            "catalogNs": {
+              "mappings": [
+                {"pageSlug": "cardpocalypse", "pageType": "productHome"}
+              ]
+            },
+            "offerMappings": [
+              {"pageSlug": "cardpocalypse-offer", "pageType": "offer"}
+            ],
             "keyImages": [
               {"type": "OfferImageWide", "url": "https://cdn.example.com/wide.jpg"}
             ],
@@ -47,6 +55,8 @@ const epicFixture = `{
             "id": "game-id-2",
             "namespace": "ns2",
             "productSlug": "paid-game",
+            "catalogNs": {"mappings": null},
+            "offerMappings": null,
             "promotions": {
               "promotionalOffers": [
                 {"promotionalOffers": [
@@ -78,7 +88,7 @@ describe("EpicProvider", () => {
     const want: Game = {
       title: "Free Game One",
       store: "Epic Games",
-      url: "https://store.epicgames.com/en-US/p/free-game-one",
+      url: "https://store.epicgames.com/en-US/p/cardpocalypse",
       description: "A free game for testing.",
       imageUrl: "https://cdn.example.com/wide.jpg",
       freeUntil: new Date("2099-12-31T00:00:00Z"),

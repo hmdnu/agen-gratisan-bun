@@ -52,11 +52,28 @@ export function toGame(release: FreeGameRelease): Game {
   };
 }
 
-/** Builds the Epic store page for an element, falling back to URLSlug. */
+/** Builds the Epic store page, preferring canonical productHome mappings with legacy slug fallback. */
 export function storeURL(element: EpicElement): string {
-  let slug = element.productSlug ?? "";
+  let slug = "";
+  for (const mapping of element.catalogNs?.mappings ?? []) {
+    if (mapping.pageType === "productHome" && mapping.pageSlug !== "") {
+      slug = mapping.pageSlug;
+      break;
+    }
+  }
   if (slug === "") {
-    slug = element.urlSlug;
+    for (const mapping of element.offerMappings) {
+      if (mapping.pageType === "productHome" && mapping.pageSlug !== "") {
+        slug = mapping.pageSlug;
+        break;
+      }
+    }
+  }
+  if (slug === "") {
+    slug = element.productSlug ?? "";
+    if (slug === "") {
+      slug = element.urlSlug;
+    }
   }
   if (slug === "") {
     return "";

@@ -22,6 +22,8 @@ function element(promotions: Promotions | null, title = ""): EpicElement {
     urlSlug: "",
     keyImages: [],
     promotions,
+    catalogNs: null,
+    offerMappings: [],
   };
 }
 
