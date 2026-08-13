@@ -1,0 +1,26 @@
+{
+  "name": "agen-gratisan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Discord bot notifying free games from Epic Games and Steam (TypeScript/Node.js port)",
+  "type": "module",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.3.14",
+  "scripts": {
+    "build": "tsc",
+    "start": "bun run src/main.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "discord.js": "^14",
+    "dotenv": "^16"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/node": "^22",
+    "typescript": "^5",
+    "vitest": "^3"
+  }
+}
