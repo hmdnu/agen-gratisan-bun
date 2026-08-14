@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { loadEnv, parseGoDuration } from "../src/config/env.js";
+import { loadEnv, parseAppIds, parseGoDuration } from "../src/config/env.js";
 
 describe("parseGoDuration", () => {
   it("parses valid Go durations", () => {
@@ -19,6 +19,24 @@ describe("parseGoDuration", () => {
     expect(() => parseGoDuration("6")).toThrow();
     expect(() => parseGoDuration("abc")).toThrow();
     expect(() => parseGoDuration("1x")).toThrow();
+  });
+});
+
+describe("parseAppIds", () => {
+  it("parses a comma-separated app id list", () => {
+    expect(parseAppIds("214340, 214770")).toEqual([214340, 214770]);
+  });
+
+  it("returns an empty list for empty input", () => {
+    expect(parseAppIds("")).toEqual([]);
+    expect(parseAppIds("   ")).toEqual([]);
+  });
+
+  it("rejects malformed app ids", () => {
+    expect(() => parseAppIds("abc")).toThrow();
+    expect(() => parseAppIds("214340,abc")).toThrow();
+    expect(() => parseAppIds("0")).toThrow();
+    expect(() => parseAppIds("214340,")).toThrow();
   });
 });
 

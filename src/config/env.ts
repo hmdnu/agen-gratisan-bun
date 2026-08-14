@@ -7,6 +7,7 @@ export interface Env {
   discordChannelId: string;
   epicApiUrl: string;
   steamApiUrl: string;
+  steamWatchAppids: number[];
   checkIntervalMs: number;
 }
 
@@ -58,13 +59,33 @@ export function loadEnv(): Env {
     throw new Error("STEAM_API_URL is required");
   }
 
+  const steamWatchAppids = parseAppIds(process.env["STEAM_WATCH_APPIDS"] ?? "");
+
   return {
     discordToken,
     discordChannelId,
     epicApiUrl,
     steamApiUrl,
+    steamWatchAppids,
     checkIntervalMs,
   };
+}
+
+// parseAppIds parses a comma-separated Steam app-id list ("214340,214770")
+// into numbers; empty or whitespace-only input yields an empty list, and any
+// malformed entry throws.
+export function parseAppIds(input: string): number[] {
+  const trimmed = input.trim();
+  if (trimmed === "") {
+    return [];
+  }
+  return trimmed.split(",").map((part) => {
+    const n = Number(part.trim());
+    if (!Number.isInteger(n) || n <= 0) {
+      throw new Error('STEAM_WATCH_APPIDS must be a comma-separated list of app ids, e.g. "214340,214770"');
+    }
+    return n;
+  });
 }
 
 const DURATION_RE = /([+-]?\d+(?:\.\d+)?)(ns|us|µs|μs|ms|s|m|h)/g;

@@ -32,7 +32,7 @@ export async function runBot(): Promise<void> {
 
     const providers: Provider[] = [
       new EpicProvider(httpClient, env.epicApiUrl),
-      new SteamProvider(httpClient, env.steamApiUrl),
+      new SteamProvider(httpClient, env.steamApiUrl, env.steamWatchAppids),
     ];
     const stop = new AbortController();
     new Scheduler(

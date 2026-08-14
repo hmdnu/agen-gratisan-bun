@@ -28,6 +28,7 @@ This is the TypeScript/Node.js port of the Go codebase (kept intact at the repos
    | `DISCORD_CHANNEL_ID` | yes | — | Channel that receives notifications |
    | `EPIC_API_URL` | yes | — | Epic free-games-promotions endpoint |
    | `STEAM_API_URL` | yes | — | Steam featuredcategories endpoint |
+   | `STEAM_WATCH_APPIDS` | no | — | Comma-separated Steam appids also polled via `appdetails` for 100%-off promos the featured list omits (e.g. `214340` for Deponia) |
    | `CHECK_INTERVAL` | no | `6h` | Fallback poll interval (positive Go-style duration, e.g. `30m`, `1h30m`) |
 
    `.env` is optional: when present it is loaded, otherwise the bot falls back to process environment variables (e.g. a hosting panel's env-var settings). A required variable missing from both fails startup.
@@ -60,7 +61,7 @@ Poll cycle (see `src/bot.ts`):
 ### Providers
 
 - **Epic** (`src/provider/epic`) — parses the store catalog response, keeps current free promotions (`discountPercentage == 0`), maps to `Game` with `sourceId = namespace:id`, and wakes at the next promotion start.
-- **Steam** (`src/provider/steam`) — parses `specials.items[]`, keeps `discount_percent == 100`, maps with `sourceId = appid`, `freeUntil` from `discount_expiration`, image falls back from `header_image` to `large_capsule_image`. Limitation: the endpoint exposes only a ~10-item featured `specials` list, so a 100%-off promo that is not featured there is not seen; Steam cards carry no description (per-game enrichment is intentionally out of scope).
+- **Steam** (`src/provider/steam`) — parses `specials.items[]`, keeps `discount_percent == 100`, maps with `sourceId = appid`, `freeUntil` from `discount_expiration`, image falls back from `header_image` to `large_capsule_image`. The featured list is a curated ~10 items, so the bot also queries Steam's search page (`specials=1&maxprice=free`, URL derived from `STEAM_API_URL`) for all current 100%-off promos the list omits; `STEAM_WATCH_APPIDS` remains as an extra per-app check via `appdetails`. Search-page and watchlist items carry no expiry, so `freeUntil` is null and they notify once. Steam cards carry no description (per-game enrichment is intentionally out of scope).
 
 ### Error policy
 
